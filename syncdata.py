@@ -10,7 +10,7 @@
 
 import argparse
 import loguru as logger
-from urllib import request, parse
+from urllib import request, parse, error as urllib_error
 import sys
 
 PASTEBIN_POST_TARGET = "https://pastebin.com/api/api_post.php"
@@ -42,7 +42,7 @@ def parse_arguments():
     # python3 syncdata.py --action push --source file --file /home/user/file.txt --developer_api_key 1234567890abcdef
     # python3 syncdata.py --action pull --source stdout --object f1nb6pXQ --developer_api_key 1234567890abcdef
     # python3 syncdata.py --action pull --source file --file /home/user/file.txt --object f1nb6pXQ --developer_api_key 1234567890abcdef
-    
+
     return args
 
 # the fucntion accepts a pastebin file specifier such as "f1nb6pXQ" and returns the URL of the file such as "https://pastebin.com/f1nb6pXQ"
@@ -54,9 +54,15 @@ def upload_data(data_to_upload:str, developer_key:str) -> str:
             'api_dev_key': developer_key,
             'api_paste_code': data_to_upload,
             'api_option': 'paste'}
+    logger.logger.info("request dict is %s" % request_dict)
     encoded_request_data = parse.urlencode(request_dict).encode()
     req =  request.Request(PASTEBIN_POST_TARGET, data=encoded_request_data, method='POST') 
-    resp = request.urlopen(req)
+    logger.logger.info("request created")
+    try: 
+        resp = request.urlopen(req)
+    except urllib_error.HTTPError as e:
+        logger.logger.error("Failed to upload data to pastebin.com, error: %s" % str(e.read()))
+        exit(1)
     if resp.status != 200:
         raise Exception("Failed to upload data to pastebin.com, error code: %s, error data: %s" % (resp.status, resp.read()))
     
