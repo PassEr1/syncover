@@ -16,12 +16,18 @@ import sys
 PASTEBIN_POST_TARGET = "https://pastebin.com/api/api_post.php"
 PASTEBIN_GET_DATA_TARGET_FORMAT = "https://pastebin.com/raw/%s"
 
+#refactor this function to use argparse properly
+#usage examples:
+    # python3 syncdata.py --action push --source stdin --developer_api_key 1234567890abcdef
+    # python3 syncdata.py --action push --source file --file /home/user/file.txt --developer_api_key 1234567890abcdef
+    # python3 syncdata.py --action pull --source stdout --object f1nb6pXQ --developer_api_key 1234567890abcdef
+    # python3 syncdata.py --action pull --source file --file /home/user/file.txt --object f1nb6pXQ --developer_api_key 1234567890abcdef
 def parse_arguments():
     # if action pull is specified then token must be specified too.
     parser = argparse.ArgumentParser(description="Uploads and downloads data from and to pastebin.com using the pastebin API" + "",)
-    parser.add_argument("--action", help="selects between upload and download of data", required=True)
+    parser.add_argument("--action", help="< push | pull >selects between upload and download of data", required=True, options=["push", "pull"])
     parser.add_argument("--source", help="selects where to upload or download data from", required=True)
-    parser.add_argument("--file", help="selects the file to upload or download", required=False)
+    parser.add_argument("--file", help="< file| stdin | stdout > selects the file to upload or download", required=False, ops=["file", "stdin", "stdout"])
     #parse developer key:
     parser.add_argument("--developer_api_key", help="pastebin developer key", required=True)
     #example value: "f1nb6pXQ"
@@ -37,12 +43,6 @@ def parse_arguments():
     if args.source == "file" and args.file is None:
         logger.logger.error("file is not specified")
         exit(1)
-    #usage examples:
-    # python3 syncdata.py --action push --source stdin --developer_api_key 1234567890abcdef
-    # python3 syncdata.py --action push --source file --file /home/user/file.txt --developer_api_key 1234567890abcdef
-    # python3 syncdata.py --action pull --source stdout --object f1nb6pXQ --developer_api_key 1234567890abcdef
-    # python3 syncdata.py --action pull --source file --file /home/user/file.txt --object f1nb6pXQ --developer_api_key 1234567890abcdef
-
     return args
 
 # the fucntion accepts a pastebin file specifier such as "f1nb6pXQ" and returns the URL of the file such as "https://pastebin.com/f1nb6pXQ"
