@@ -16,7 +16,6 @@ import sys
 PASTEBIN_POST_TARGET = "https://pastebin.com/api/api_post.php"
 PASTEBIN_GET_DATA_TARGET_FORMAT = "https://pastebin.com/raw/%s"
 
-#refactor this function to use argparse properly
 #usage examples:
     # python3 syncdata.py --action push --source stdin --developer_api_key 1234567890abcdef
     # python3 syncdata.py --action push --source file --file /home/user/file.txt --developer_api_key 1234567890abcdef
